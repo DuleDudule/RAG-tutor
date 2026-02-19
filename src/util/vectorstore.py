@@ -3,12 +3,7 @@ from qdrant_client import QdrantClient
 from qdrant_client.http.models import Distance, VectorParams
 from langchain_ollama import OllamaEmbeddings
 from langchain_openai import OpenAIEmbeddings
-import os
-from dotenv import load_dotenv, find_dotenv
 from pathlib import Path
-
-load_dotenv(find_dotenv())
-
 
 def get_vectorstore(embedding_model : OllamaEmbeddings | OpenAIEmbeddings,collection_name : str):
     """
