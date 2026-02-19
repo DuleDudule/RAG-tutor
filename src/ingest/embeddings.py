@@ -32,7 +32,15 @@ def require_ollama(model_name):
         raise RuntimeError("Failed to query Ollama models")
 
 
-def get_embeddings(mode : Literal["local","cloud"],model_name : str = "qwen3-embedding:0.6b"):
+def get_embedding_model(mode : Literal["local","cloud"],model_name : str = "qwen3-embedding:0.6b"):
+    """
+    Return an embedding model based on .env setup and args.
+
+    Args:
+        mode  ("local","cloud") : Local uses Ollama, cloud uses OpenAI api and needs an api_key set.
+        model_name (str) : Passed through to Ollama if using local mode, if using cloud set to text-embedding-3-small.
+
+    """
     if mode=="cloud":
         api_key = os.getenv("OPENAI_API_KEY")
         if not api_key:

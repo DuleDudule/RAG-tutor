@@ -34,7 +34,9 @@ venv.bak/
 
 data/raw/*
 data/processed/*
-
+data/vector_db/**/.lock
+data/vector_db/**/*-wal
+data/vector_db/**/*-shm
 .vscode/
 .idea/
 *.swp
