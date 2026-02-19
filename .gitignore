@@ -32,8 +32,8 @@ ENV/
 env.bak/
 venv.bak/
 
-# data/raw/*
-# data/processed/*
+data/raw/*
+data/processed/*
 
 .vscode/
 .idea/
