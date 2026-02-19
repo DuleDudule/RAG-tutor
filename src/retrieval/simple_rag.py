@@ -1,6 +1,6 @@
-from ..util.embeddings import get_embedding_model
-from ..util.vectorstore import get_vectorstore
-from ..util.llm import get_llm
+from src.util.embeddings import get_embedding_model
+from src.util.vectorstore import get_vectorstore
+from src.util.llm import get_llm
 from langchain_core.messages import SystemMessage, HumanMessage
 
 
@@ -13,7 +13,9 @@ def simple_chain(query : str):
     docs_content = "\n\n".join(doc.page_content for doc in retrieved_docs)
 
     system_message = (
-        "You are a helpful assistant. Use the following context in your response:"
+        "You are a helpful assistant. Use the following context to answer the users question."\
+        "If there isn't enough information to answer the question say you don't know." \
+        "Here is the context:"\
         f"\n\n{docs_content}"
     )
     messages = [
@@ -23,8 +25,7 @@ def simple_chain(query : str):
 
     llm = get_llm("local","llama3.2:1b")
 
-    response = llm.invoke(messages)
+    for chunk in llm.stream(messages):
+        yield chunk.content
 
-    return response.content
 
-print(simple_chain("Who does the author acknowledge?"))
