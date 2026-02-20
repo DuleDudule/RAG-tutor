@@ -7,7 +7,7 @@ from langchain_core.messages import SystemMessage, HumanMessage
 def simple_chain(query : str):
 
     embedding_model = get_embedding_model("local")
-    vector_store = get_vectorstore(embedding_model,"simple_chunking_first_50")
+    vector_store = get_vectorstore(embedding_model,"simple_chunking_whole_book")
     retrieved_docs = vector_store.similarity_search(query)
 
     docs_content = "\n\n".join(doc.page_content for doc in retrieved_docs)
@@ -27,5 +27,6 @@ def simple_chain(query : str):
 
     for chunk in llm.stream(messages):
         yield chunk.content
+
 
 
