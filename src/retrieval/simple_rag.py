@@ -23,7 +23,7 @@ def simple_chain(query : str):
         HumanMessage(content=query)
     ]
 
-    llm = get_llm("local","llama3.2:1b")
+    llm = get_llm(mode="local",model_name="qwen3:1.7b")
 
     for chunk in llm.stream(messages):
         yield chunk.content

@@ -1,6 +1,8 @@
 import streamlit as st
 from src.retrieval.simple_rag import simple_chain
 import sys, os
+from dotenv import load_dotenv
+load_dotenv() 
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 st.title("RAG tutor")
@@ -19,6 +21,6 @@ if prompt := st.chat_input("How can I help you with Data Mining?"):
 
     with st.chat_message("assistant"):
         response = st.write_stream(simple_chain(prompt))
-    # Add assistant response to chat history
+
     st.session_state.messages.append({"role": "assistant", "content": response})
 
