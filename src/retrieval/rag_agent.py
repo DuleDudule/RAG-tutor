@@ -1,24 +1,29 @@
-from src.util.embeddings import get_embedding_model
 from src.util.vectorstore import get_vectorstore
-from src.util.llm import get_llm
 from langchain.tools import tool
 from langchain.agents import create_tool_calling_agent,AgentExecutor
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-
-embedding_model = get_embedding_model("local")
-llm = get_llm(mode="local",model_name="qwen3:1.7b")
-
+from src.util.env_check import get_rag_models
 
 prompt = ChatPromptTemplate.from_messages(
     [
-        ("system", "You are a helpful assistant. Use the available tool to answer the users question."\
-        "If there isn't enough information to answer the question say that you don't know."),
+        ("system", 
+        "You are a helpful assistant that uses information in "\
+        "Data Mining: The Textbook to answer user questions. "\
+        "Use the available tool to search for the answer in the book."
+        "Make sure to base your answer solely on the snippets from the book."\
+        "When writing mathematical formulas, you MUST use LaTeX notation: \n"\
+        "- Use double dollar signs for standalone equations (e.g., $$E=mc^2$$).\n"\
+        "- Use single dollar signs for inline math (e.g., $x^2$).\n"\
+        "Do not use brackets like [ ] or ( ) for math."\
+        "If there isn't enough information to answer the question say you don't know." \
+        ),
         MessagesPlaceholder("chat_history", optional=True),
         ("human", "{input}"),
         MessagesPlaceholder("agent_scratchpad"),
     ]
 )
 
+llm, embedding_model = get_rag_models()
 
 def rag_agent(query: str,collection_name: str):
     vectorstore = get_vectorstore(embedding_model,collection_name)
