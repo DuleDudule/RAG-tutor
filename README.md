@@ -57,6 +57,15 @@ ollama pull qwen3-embedding:0.6b && ollama pull qwen3:1.7b
 ```
 If you want to use te OpenAI api you need to set the appropriate variables to "cloud" and configure and set an api key and model name supported by the OpenAI api
 
-### 4. Considerations
+### 4. Ingest
+To run the app run the following in the terminal:
+```bash
+poetry run python -m streamlit run app/chatbot.py
+```
+Navigate to the ingest page in the sidebar, choose your preprocessing strategy and upload the Data Mining Textbook.
+Now on the chatbot page select the collection you just uploaded, adjust parameters and chat with the LLM equiped with the knowledge from the book.
+By uploading the book using different strategies and choosing those collections on the chat page you can compare the quality of the answers.
+
+### 5. Considerations
 - **Embedding model** - Different embedding models produce embeddings (vectors) of different sizes. If you use one model to process the book and save it to the vector database and then change the model later you might run into errors. Make sure to match the embedding model you pass to the vectorstore in the retrieval phase to the one used to ingest the document.
 - **RAG** - Answer quality changes drastically based on the capabilities of the LLM you use. For best results use the largest model your system can handle locally or the OpenAI api. If you're running a model localy make sure it supports "tool calling". That is how the llm interacts with the database.
