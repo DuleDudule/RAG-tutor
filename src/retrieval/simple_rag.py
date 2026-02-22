@@ -5,16 +5,16 @@ from langchain_core.messages import SystemMessage, HumanMessage
 
 llm, embedding_model = get_rag_models()
 
-def simple_chain(query : str,collection_name: str):
+def simple_chain(query : str,collection_name: str,top_k: int):
     """
     Simple rag implementation where the user question is used to 
     find the most similar chunks of the book. 
     These are passed to the llm as context from which it should answer
     """
     vector_store = get_vectorstore(embedding_model,collection_name)
-    retrieved_docs = vector_store.similarity_search(query)
+    retrieved_docs = vector_store.similarity_search(query,k=top_k)
 
-    docs_content = "\n\n".join(doc.page_content for doc in retrieved_docs)
+    docs_content = "\n<TEXT CHUNK>\n".join(doc.page_content for doc in retrieved_docs)
 
     system_message = (
         "You are a helpful assistant that uses information in "\

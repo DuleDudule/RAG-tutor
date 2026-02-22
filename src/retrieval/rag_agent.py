@@ -9,7 +9,7 @@ prompt = ChatPromptTemplate.from_messages(
         ("system", 
         "You are a helpful assistant that uses information in "\
         "Data Mining: The Textbook to answer user questions. "\
-        "Use the available tool to search for the answer in the book."
+        "You MUST use the available tool to search for the answer in the book."
         "Make sure to base your answer solely on the snippets from the book."\
         "When writing mathematical formulas, you MUST use LaTeX notation: \n"\
         "- Use double dollar signs for standalone equations (e.g., $$E=mc^2$$).\n"\
@@ -25,9 +25,9 @@ prompt = ChatPromptTemplate.from_messages(
 
 llm, embedding_model = get_rag_models()
 
-def rag_agent(query: str,collection_name: str):
+def rag_agent(query: str,collection_name: str,top_k: int):
     vectorstore = get_vectorstore(embedding_model,collection_name)
-    retriever = vectorstore.as_retriever()
+    retriever = vectorstore.as_retriever(search_kwargs ={"k":top_k})
     
     @tool
     def retrieve_book_context(query: str) -> str:
