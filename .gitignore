@@ -35,6 +35,9 @@ venv.bak/
 data/raw/*
 data/processed/*
 data/vector_db/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/vector_db/.gitkeep
 .vscode/
 .idea/
 *.swp
