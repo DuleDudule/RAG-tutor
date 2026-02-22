@@ -5,10 +5,8 @@ from langchain_ollama import OllamaEmbeddings
 from langchain_openai import OpenAIEmbeddings
 from pathlib import Path
 
-#Singleton qdrant collection
 _QDRANT_CLIENT = None  
 
-# Ensuring database path stays consistent
 current_file_path = Path(__file__).resolve()
 project_root = current_file_path.parent.parent.parent
 db_path = project_root / "data" / "vector_db" / "qdrant"

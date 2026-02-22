@@ -4,6 +4,7 @@ from src.util.vectorstore import get_all_collection_names
 import re
 import os
 from src.ingest.simple_ingest import simple_ingest
+from src.ingest.advanced_ingest import advanced_ingest
 
 def sanitize_filename(filename: str) -> str:
     name, ext = os.path.splitext(filename)
@@ -23,8 +24,8 @@ st.markdown("Upload the book pdf to process and add it to your Vector Database."
 
 INGEST_METHODS = {
     "Simple Chunking (Fixed Size)": "simple",
-    "Semantic Chunking (AI-based)": "semantic",
-    "Recursive Character (Paragraphs)": "recursive"
+    "Advanced chunking (chapter-based)": "chapter",
+    # "Recursive Character (Paragraphs)": "recursive"
 }
 
 with st.container(border=True):
@@ -78,7 +79,9 @@ with st.container(border=True):
                     try:
                         if method_key == "simple":
                             num_chunks = simple_ingest(file_path, collection_name)
-                        
+                        elif method_key == "chapter":
+                            num_chunks = advanced_ingest(file_path,collection_name)
+                            
                         status.update(label="✅ Ingestion Complete!", state="complete", expanded=False)
                         st.success(f"Ingested **{num_chunks}** chunks into the collection: `{clean_name}`.")
                         st.balloons()
