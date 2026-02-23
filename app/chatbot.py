@@ -75,7 +75,7 @@ main_col, side_col = st.columns([3, 1],gap="medium")
 with main_col:
     if "messages" not in st.session_state:
         st.session_state.messages = []
-    chat_container = st.container(height=800)
+    chat_container = st.container(height=600)
     with chat_container:
         for message in st.session_state.messages:
             with st.chat_message(message["role"]):
