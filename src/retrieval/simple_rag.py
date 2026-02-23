@@ -14,8 +14,14 @@ def simple_chain(query : str,collection_name: str,top_k: int):
     vector_store = get_vectorstore(embedding_model,collection_name)
     retrieved_docs = vector_store.similarity_search(query,k=top_k)
 
-    docs_content = "\n<TEXT CHUNK>\n".join(doc.page_content for doc in retrieved_docs)
-
+    
+    
+    docs_content = "\n<TEXT CHUNK>\n".join(
+        doc.metadata.get("raw_text", doc.page_content) 
+        if "preprocessed" in doc.metadata else doc.page_content 
+        for doc in retrieved_docs
+    )
+    
     system_message = (
         "You are a helpful assistant that uses information in "\
         "Data Mining: The Textbook to answer user questions. Use the following context ONLY to answer the users question."\

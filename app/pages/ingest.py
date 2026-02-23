@@ -43,6 +43,11 @@ with st.container(border=True):
     )
     st.caption("Use only **lowercase letters, numbers, and underscores** (e.g., `my_data_01`). No spaces.")
     clean_name = collection_name.strip()
+    do_preprocess = st.checkbox(
+        "Apply stemming and stop word removal", 
+        value=False,
+        help="This setting will not necessarily improve embedding quality since the embedding models are trained on full gramatically correct text. "
+    )
 
     if st.button("Start Ingestion", use_container_width=True):
         if not uploaded_file:
@@ -78,9 +83,9 @@ with st.container(border=True):
                     
                     try:
                         if method_key == "simple":
-                            num_chunks = simple_ingest(file_path, collection_name)
+                            num_chunks = simple_ingest(file_path, collection_name,do_preprocess)
                         elif method_key == "chapter":
-                            num_chunks = advanced_ingest(file_path,collection_name)
+                            num_chunks = advanced_ingest(file_path,collection_name,do_preprocess)
                             
                         status.update(label="✅ Ingestion Complete!", state="complete", expanded=False)
                         st.success(f"Ingested **{num_chunks}** chunks into the collection: `{clean_name}`.")

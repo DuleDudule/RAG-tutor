@@ -7,7 +7,7 @@ from src.util.env_check import get_embed_model
 from src.util.vectorstore import get_vectorstore
 from pathlib import Path
 
-def advanced_ingest(path: str, collection_name: str, page_offset: int = 26):
+def advanced_ingest(path: str, collection_name: str,stem_and_stop: bool = False, page_offset: int = 26):
     """
     Ingests a PDF into Qdrant by first splitting it into chapters based on a JSON mapping,
     merging chapter pages, chunking them, and injecting metadata into the text.
@@ -66,6 +66,7 @@ def advanced_ingest(path: str, collection_name: str, page_offset: int = 26):
             chapter_doc = Document(page_content=chapter_text, metadata=chapter_metadata)
             chapter_chunks = text_splitter.split_documents([chapter_doc])
             
+            
             all_chunks.extend(chapter_chunks)    
             
         for chunk in all_chunks:
@@ -78,6 +79,12 @@ def advanced_ingest(path: str, collection_name: str, page_offset: int = 26):
                 f"Source: {source_file.split('/')[-1]}\n"
                 f"----------\n"
             )
+
+            if stem_and_stop:
+                from src.util.stemming import preprocess_text
+                chunk.metadata["raw_text"] = chunk.page_content
+                chunk.metadata["preprocessed"] = True
+                chunk.page_content = preprocess_text(chunk.page_content)
             chunk.page_content = metadata_header + chunk.page_content
 
         embedding_model = get_embed_model()

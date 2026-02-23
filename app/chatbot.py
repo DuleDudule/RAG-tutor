@@ -93,4 +93,5 @@ with side_col:
     else:
         st.info("Chunks used for the answer will appear here. "\
                 "If no chunks appear the model didn't use the retriever tool and search the database, "\
-                "it answered from its own knowledge. Try again or use a smarter (larger) model.")
+                "it answered from its own knowledge. Try again or use a smarter (larger) model."\
+                "Using the 'Simple RAG' option will return the chunks every time since it always searches the database")

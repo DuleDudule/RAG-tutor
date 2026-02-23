@@ -4,6 +4,7 @@ from qdrant_client.http.models import Distance, VectorParams
 from langchain_ollama import OllamaEmbeddings
 from langchain_openai import OpenAIEmbeddings
 from pathlib import Path
+import atexit
 
 _QDRANT_CLIENT = None  
 
@@ -22,9 +23,18 @@ def _get_client() -> QdrantClient:
                 _QDRANT_CLIENT = None
 
     if _QDRANT_CLIENT is None:
-        _QDRANT_CLIENT = QdrantClient(path=db_path)
+        _QDRANT_CLIENT = QdrantClient(path=db_path,force_disable_check_same_thread= True)
+        atexit.register(close_qdrant_client)
     return _QDRANT_CLIENT
 
+def close_qdrant_client():
+    global _QDRANT_CLIENT
+    if _QDRANT_CLIENT is not None:
+        try:
+            _QDRANT_CLIENT.close()
+        except Exception:
+            pass
+        _QDRANT_CLIENT = None
 def get_vectorstore(embedding_model : OllamaEmbeddings | OpenAIEmbeddings,collection_name : str):
     """
     Return vectorstore connected to a local collection. 

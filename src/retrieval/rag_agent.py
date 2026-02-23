@@ -35,7 +35,7 @@ def rag_agent(query: str,collection_name: str,top_k: int):
         docs = retriever.invoke(query)
         retrieved_docs.extend(docs)
         return "\n\n".join(
-            (f"Source: {doc.metadata}\nContent: {doc.page_content}")
+            f"Source: {doc.metadata}\nContent: {doc.metadata.get('raw_text', doc.page_content) if doc.metadata.get('preprocessed') else doc.page_content}"
             for doc in docs
         )
     tools = [retrieve_book_context]

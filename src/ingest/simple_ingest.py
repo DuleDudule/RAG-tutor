@@ -4,7 +4,7 @@ from src.util.env_check import get_embed_model
 from src.util.vectorstore import get_vectorstore
 from uuid import uuid4
 
-def simple_ingest(path: str, collection_name: str):
+def simple_ingest(path: str, collection_name: str,stem_and_stop: bool = False):
     """
     Ingests a PDF into Qdrant using RecursiveCharacter splitting.
     Returns the count of documents ingested.
@@ -22,6 +22,13 @@ def simple_ingest(path: str, collection_name: str):
         )
         texts = text_splitter.split_documents(docs)
 
+        if stem_and_stop:
+            from src.util.stemming import preprocess_text
+            for text in texts:
+                text.metadata["raw_text"] = text.page_content
+                text.metadata["preprocessed"] = True
+                text.page_content = preprocess_text(text.page_content)
+                
         embedding_model = get_embed_model()
         vector_store = get_vectorstore(embedding_model, collection_name)
 
