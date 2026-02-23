@@ -48,6 +48,24 @@ with st.container(border=True):
         value=False,
         help="This setting will not necessarily improve embedding quality since the embedding models are trained on full gramatically correct text. "
     )
+    chunk_size = st.slider(
+        "Maximum size of text chunks (in characters):",
+        min_value=200,
+        max_value=4000,
+        value=2000,
+        help=(
+            "Higher values yield larger chunks. The larger the chunk the more information it carries."\
+            " Large individual chunks have less semantic meaning."\
+            " Chunks too small don't capture enough information."
+        )
+    )
+    chunk_overlap = st.slider(
+        "Chunk overlap (in characters):",
+        min_value=0,
+        max_value=1000,
+        value=300,
+        help="To prevent loosing information split between chunks each chunk overlaps the previous and next one."
+    )
 
     if st.button("Start Ingestion", use_container_width=True):
         if not uploaded_file:
@@ -83,11 +101,11 @@ with st.container(border=True):
                     
                     try:
                         if method_key == "simple":
-                            num_chunks = simple_ingest(file_path, collection_name,do_preprocess)
+                            num_chunks = simple_ingest(file_path, collection_name,do_preprocess,chunk_size,chunk_overlap)
                         elif method_key == "chapter":
-                            num_chunks = advanced_ingest(file_path,collection_name,do_preprocess)
+                            num_chunks = advanced_ingest(file_path,collection_name,do_preprocess,chunk_size,chunk_overlap)
                             
-                        status.update(label="✅ Ingestion Complete!", state="complete", expanded=False)
+                        status.update(label="✅ Ingestion Complete", state="complete", expanded=False)
                         st.success(f"Ingested **{num_chunks}** chunks into the collection: `{clean_name}`.")
                         st.balloons()
                         

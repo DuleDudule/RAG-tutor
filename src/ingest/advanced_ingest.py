@@ -7,7 +7,7 @@ from src.util.env_check import get_embed_model
 from src.util.vectorstore import get_vectorstore
 from pathlib import Path
 
-def advanced_ingest(path: str, collection_name: str,stem_and_stop: bool = False, page_offset: int = 26):
+def advanced_ingest(path: str, collection_name: str,stem_and_stop: bool = False, chunk_size: int = 2000, chunk_overlap: int = 200,  page_offset: int = 26):
     """
     Ingests a PDF into Qdrant by first splitting it into chapters based on a JSON mapping,
     merging chapter pages, chunking them, and injecting metadata into the text.
@@ -27,8 +27,8 @@ def advanced_ingest(path: str, collection_name: str,stem_and_stop: bool = False,
             raise ValueError("The PDF appears to be empty or unreadable.")
 
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=2000, 
-            chunk_overlap=200,
+            chunk_size=chunk_size, 
+            chunk_overlap=chunk_overlap,
             separators=["\n\n", "\n", " ", ""]
         )
         

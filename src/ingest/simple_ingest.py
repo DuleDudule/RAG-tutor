@@ -4,7 +4,7 @@ from src.util.env_check import get_embed_model
 from src.util.vectorstore import get_vectorstore
 from uuid import uuid4
 
-def simple_ingest(path: str, collection_name: str,stem_and_stop: bool = False):
+def simple_ingest(path: str, collection_name: str,stem_and_stop: bool = False, chunk_size: int = 2000, chunk_overlap: int = 200,):
     """
     Ingests a PDF into Qdrant using RecursiveCharacter splitting.
     Returns the count of documents ingested.
@@ -17,8 +17,8 @@ def simple_ingest(path: str, collection_name: str,stem_and_stop: bool = False):
             raise ValueError("The PDF appears to be empty or unreadable.")
 
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=2000, 
-            chunk_overlap=200,
+            chunk_size=chunk_size, 
+            chunk_overlap=chunk_overlap,
         )
         texts = text_splitter.split_documents(docs)
 

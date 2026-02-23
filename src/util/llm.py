@@ -24,7 +24,7 @@ def get_llm(mode : Literal["local","cloud"],model_name : str = "qwen3-embedding:
 
     elif mode=="local":
         # require_ollama(model_name)
-        llm = ChatOllama(model=model_name,base_url="http://192.168.0.86:11434")
+        llm = ChatOllama(model=model_name)
  
     else:
         raise ValueError("mode must be 'local' or 'cloud'")
