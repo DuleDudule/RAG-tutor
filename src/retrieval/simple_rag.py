@@ -1,11 +1,12 @@
 from src.util.vectorstore import get_vectorstore
 from src.util.env_check import get_rag_models
-from langchain_core.messages import SystemMessage, HumanMessage
+from langchain_core.messages import SystemMessage, HumanMessage, BaseMessage
+from typing import List, Optional
 
 
 llm, embedding_model = get_rag_models()
 
-def simple_chain(query : str,collection_name: str,top_k: int):
+def simple_chain(query : str,collection_name: str,top_k: int, chat_history: Optional[List[BaseMessage]] = None):
     """
     Simple rag implementation where the user question is used to 
     find the most similar chunks of the book. 
@@ -47,10 +48,13 @@ def simple_chain(query : str,collection_name: str,top_k: int):
         "Here is the context:\n"
         f"{docs_content}"
     )
-    messages = [
-        SystemMessage(content=system_message),
-        HumanMessage(content=query)
-    ]
+    
+    messages = [SystemMessage(content=system_message)]
+    
+    if chat_history:
+        messages.extend(chat_history)
+        
+    messages.append(HumanMessage(content=query))
 
 
     for chunk in llm.stream(messages):

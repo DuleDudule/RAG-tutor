@@ -2,6 +2,7 @@ import streamlit as st
 from src.retrieval.simple_rag import simple_chain
 from src.retrieval.rag_agent import rag_agent
 from src.util.vectorstore import get_all_collection_names
+from langchain_core.messages import HumanMessage, AIMessage
 import sys, os
 from dotenv import load_dotenv
 load_dotenv() 
@@ -49,6 +50,13 @@ with st.sidebar:
         options=list(CHAIN_OPTIONS.keys()),
         help="Simple RAG always uses context; Agentic RAG decides if it needs the book."
     )
+    
+    use_history = st.checkbox(
+        "Use Chat History", 
+        value=True,
+        help="Toggle this off if you are using a small model with limited context window."
+    )
+    
     st.divider()
 
     st.header("Retrieval Settings")
@@ -88,7 +96,15 @@ with main_col:
                 st.markdown(prompt)
 
             with st.chat_message("assistant"):
-                response_gen = chosen_chain_func(prompt,selected_collection,top_k)
+                history = []
+                if use_history:
+                    for msg in st.session_state.messages[:-1]:
+                        if msg["role"] == "user":
+                            history.append(HumanMessage(content=msg["content"]))
+                        else:
+                            history.append(AIMessage(content=msg["content"]))
+
+                response_gen = chosen_chain_func(prompt,selected_collection,top_k, chat_history=history)
                 response = st.write_stream(stream_handler(response_gen))
                 if isinstance(response, list):
                     st.session_state.last_chunks = response

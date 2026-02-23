@@ -33,7 +33,7 @@ prompt = ChatPromptTemplate.from_messages(
 
 llm, embedding_model = get_rag_models()
 
-def rag_agent(query: str,collection_name: str,top_k: int):
+def rag_agent(query: str,collection_name: str,top_k: int, chat_history=None):
     vectorstore = get_vectorstore(embedding_model,collection_name)
     retrieved_docs = []
     @tool
@@ -54,7 +54,7 @@ def rag_agent(query: str,collection_name: str,top_k: int):
     agent = create_tool_calling_agent(llm, tools,prompt)
     agent_executor = AgentExecutor(agent=agent, tools=tools)
 
-    for chunk in agent_executor.stream({"input": query}):
+    for chunk in agent_executor.stream({"input": query, "chat_history": chat_history or []}):
         if "output" in chunk:
             yield chunk["output"]
 
