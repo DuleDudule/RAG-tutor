@@ -18,6 +18,15 @@ CHAIN_OPTIONS = {
 
 st.set_page_config(page_title="Chat with the book",layout="wide")
 
+st.markdown("""
+    <style>
+        [data-testid="stVerticalBlockBorderWrapper"] > div:first-child {
+            height: 80vh !important;
+            max-height: 80vh !important;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
 st.title("RAG tutor")
 
 with st.sidebar:
@@ -66,21 +75,23 @@ main_col, side_col = st.columns([3, 1],gap="medium")
 with main_col:
     if "messages" not in st.session_state:
         st.session_state.messages = []
-
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
+    chat_container = st.container(height=800)
+    with chat_container:
+        for message in st.session_state.messages:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
 
     if prompt := st.chat_input("How can I help you with Data Mining?"):
         st.session_state.messages.append({"role": "user", "content": prompt})
-        with st.chat_message("user"):
-            st.markdown(prompt)
+        with chat_container:
+            with st.chat_message("user"):
+                st.markdown(prompt)
 
-        with st.chat_message("assistant"):
-            response_gen = chosen_chain_func(prompt,selected_collection,top_k)
-            response = st.write_stream(stream_handler(response_gen))
-            if isinstance(response, list):
-                st.session_state.last_chunks = response
+            with st.chat_message("assistant"):
+                response_gen = chosen_chain_func(prompt,selected_collection,top_k)
+                response = st.write_stream(stream_handler(response_gen))
+                if isinstance(response, list):
+                    st.session_state.last_chunks = response
         st.session_state.messages.append({"role": "assistant", "content": response})
         st.rerun()
 with side_col:
@@ -94,4 +105,4 @@ with side_col:
         st.info("Chunks used for the answer will appear here. "\
                 "If no chunks appear the model didn't use the retriever tool and search the database, "\
                 "it answered from its own knowledge. Try again or use a smarter (larger) model."\
-                "Using the 'Simple RAG' option will return the chunks every time since it always searches the database")
+                "Using the 'Simple RAG' option will return the chunks every time since it always searches the database.")
