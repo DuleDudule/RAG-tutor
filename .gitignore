@@ -32,13 +32,11 @@ ENV/
 env.bak/
 venv.bak/
 
-data/raw/*
+# data/raw/*
 data/processed/*
-data/vector_db/*
+data/vector_db/qdrant/.lock
 !data/raw/.gitkeep
-!data/processed/.gitkeep
 !data/processed/contents.json
-!data/vector_db/.gitkeep
 .vscode/
 .idea/
 *.swp
