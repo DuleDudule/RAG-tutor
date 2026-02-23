@@ -35,17 +35,19 @@ llm, embedding_model = get_rag_models()
 
 def rag_agent(query: str,collection_name: str,top_k: int):
     vectorstore = get_vectorstore(embedding_model,collection_name)
-    retriever = vectorstore.as_retriever(search_kwargs ={"k":top_k})
     retrieved_docs = []
     @tool
     def retrieve_book_context(query: str) -> str:
         """Search and return information from the Data Mining Textbook."""
-        docs = retriever.invoke(query)
-        retrieved_docs.extend(docs)
-        return "\n\n".join(
-            f"Source: {doc.metadata}\nContent: {doc.metadata.get('raw_text', doc.page_content) if doc.metadata.get('preprocessed') else doc.page_content}"
-            for doc in docs
-        )
+        results = vectorstore.similarity_search_with_relevance_scores(query, k=top_k)
+        docs_for_agent = []
+        for doc, score in results:
+            doc.metadata["relevance_score"] = score
+            retrieved_docs.append(doc)
+            content = doc.metadata.get('raw_text', doc.page_content) if doc.metadata.get('preprocessed') else doc.page_content
+            docs_for_agent.append(f"Source: {doc.metadata.get('source', 'Unknown')} (Content: {content}")
+        
+        return "\n\n".join(docs_for_agent)
     tools = [retrieve_book_context]
     
     

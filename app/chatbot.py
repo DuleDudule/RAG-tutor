@@ -99,7 +99,11 @@ with side_col:
     if st.session_state.last_chunks:
         for doc in st.session_state.last_chunks:
             source_name = doc.metadata.get('source', 'Unknown').split('/')[-1]
-            with st.expander(f"Source: {source_name}"):
+            score = doc.metadata.get('relevance_score', 0)
+            score_percent = f"{score:.2%}"
+
+            with st.expander(f"Source: {source_name}\nRelevance score: {score_percent}"):
+                st.progress(score)
                 st.write(doc.page_content)
     else:
         st.info("Chunks used for the answer will appear here. "\

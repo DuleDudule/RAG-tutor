@@ -12,15 +12,20 @@ def simple_chain(query : str,collection_name: str,top_k: int):
     These are passed to the llm as context from which it should answer
     """
     vector_store = get_vectorstore(embedding_model,collection_name)
-    retrieved_docs = vector_store.similarity_search(query,k=top_k)
+    retrieved_docs = vector_store.similarity_search_with_relevance_scores(query,k=top_k)
 
+    formatted_docs = []
+    docs_content_list = []
     
+    for doc, score in retrieved_docs:
+        doc.metadata["relevance_score"] = score 
+        formatted_docs.append(doc)
+        
+        content = doc.metadata.get("raw_text", doc.page_content) if "preprocessed" in doc.metadata else doc.page_content
+        docs_content_list.append(content)
+
+    docs_content = "\n<TEXT CHUNK>\n".join(docs_content_list)
     
-    docs_content = "\n<TEXT CHUNK>\n".join(
-        doc.metadata.get("raw_text", doc.page_content) 
-        if "preprocessed" in doc.metadata else doc.page_content 
-        for doc in retrieved_docs
-    )
     
     system_message = (
         "You are an expert Data Mining Tutor helping a student study from Charu C. Aggarwal's 'Data Mining: The Textbook'.\n\n"
@@ -51,7 +56,7 @@ def simple_chain(query : str,collection_name: str,top_k: int):
     for chunk in llm.stream(messages):
         yield chunk.content
 
-    yield retrieved_docs
+    yield formatted_docs
 
 
 
