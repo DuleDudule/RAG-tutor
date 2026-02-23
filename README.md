@@ -7,15 +7,11 @@
 
 ---
 
-##  Project Description
-My goal is to compare and combine traditional data mining techniques for text and Retrieval Augmented Generation. 
-The final product is a chatbot augmented with the knowledge from course literature [Data Mining The Textbook](https://link.springer.com/book/10.1007/978-3-319-14142-8) that students can use to study Data Mining.
+##  Description
+Demonstrating Retrieval Augmented Generation (RAG) and the power of embedding models to capture semantic meaning behind text data.
+The final product is an LLM chatbot augmented with the knowledge from course literature [Data Mining The Textbook](https://link.springer.com/book/10.1007/978-3-319-14142-8) that students can use to study Data Mining.
 
-##  Project Goals
-1. **Preprocessing:** Implement text cleaning and chunking pipelines.
-2. **Analysis:** Compare different retrieval algorithms and preprocessing techniques.
-3. **Visualization:** 2D/3D visualization of the book's vector space.
-4. **Interactive UI:** A chatbot interface allowing users to toggle between different data mining strategies.
+
 
 ---
 
@@ -46,7 +42,7 @@ Copy the .env.example file and set the required variables
 ```bash
 cp .env.example .env
 ```
-If you're going for local execution set the appropriate variables to "local". Pull the model you want to use and set that model name in .env. :
+If you're going for local execution set the LLM_MODE and EMBEDDING_MODE to "local". Pull the model you want to use and set that model name in .env. :
 ```bash
 ollama pull <model_name>
 ```
@@ -57,7 +53,7 @@ ollama pull qwen3-embedding:0.6b && ollama pull qwen3:1.7b
 ```
 If you want to use te OpenAI api you need to set the appropriate variables to "cloud" and configure and set an api key and model name supported by the OpenAI api
 
-### 4. Ingest
+### 4. How to use
 To run the app run the following in the terminal:
 ```bash
 poetry run python -m streamlit run app/chatbot.py
@@ -67,5 +63,6 @@ Now on the chatbot page select the collection you just uploaded, adjust paramete
 By uploading the book using different strategies and choosing those collections on the chat page you can compare the quality of the answers.
 
 ### 5. Considerations
-- **Embedding model** - Different embedding models produce embeddings (vectors) of different sizes. If you use one model to process the book and save it to the vector database and then change the model later you might run into errors. Make sure to match the embedding model you pass to the vectorstore in the retrieval phase to the one used to ingest the document.
-- **RAG** - Answer quality changes drastically based on the capabilities of the LLM you use. For best results use the largest model your system can handle locally or the OpenAI api. If you're running a model localy make sure it supports "tool calling". That is how the llm interacts with the database.
+- **Embedding model** - Different embedding models produce embeddings (vectors) of different sizes. If you use one model to process the book and save it to the vector database and then change the model later you might run into errors. Make sure to match the embedding model you you use for RAG the one used to ingest the document.
+The collections that come included with the project used the default qwen3-embedding:0.6b for ingesting so if you want to use them don't change the default model in the .env file. If you want to use an OpenAI hosted model for embedding you must first ingest the book using that model.
+- **RAG** - Answer quality changes drastically based on the capabilities of the LLM you use. For best results use the largest model your system can handle locally or the OpenAI api. If you're running a model localy make sure it supports "tool calling". That is how the llm interacts with the database. Sometimes a smaller model won't listen to instructions well and it responds to the user question from its own knowledge instead of using the data we ingested into the database.
