@@ -14,7 +14,9 @@ CHAIN_OPTIONS = {
     "Agentic RAG (Tool-Calling)": rag_agent
 }
 
-st.set_page_config(page_title="Chat with the book")
+
+
+st.set_page_config(page_title="Chat with the book",layout="wide")
 
 st.title("RAG tutor")
 
@@ -50,20 +52,45 @@ with st.sidebar:
     )
     chosen_chain_func = CHAIN_OPTIONS[selected_chain_name]
 
-if "messages" not in st.session_state:
-    st.session_state.messages = []
+if "last_chunks" not in st.session_state:
+    st.session_state.last_chunks = []
 
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+def stream_handler(generator):
+    for item in generator:
+        if isinstance(item, str):
+            yield item
+        elif isinstance(item, list):
+            st.session_state.last_chunks = item
 
-if prompt := st.chat_input("How can I help you with Data Mining?"):
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.markdown(prompt)
+main_col, side_col = st.columns([3, 1],gap="medium")
+with main_col:
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
 
-    with st.chat_message("assistant"):
-        response = st.write_stream(chosen_chain_func(prompt,selected_collection,top_k))
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
 
-    st.session_state.messages.append({"role": "assistant", "content": response})
+    if prompt := st.chat_input("How can I help you with Data Mining?"):
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        with st.chat_message("user"):
+            st.markdown(prompt)
 
+        with st.chat_message("assistant"):
+            response_gen = chosen_chain_func(prompt,selected_collection,top_k)
+            response = st.write_stream(stream_handler(response_gen))
+            if isinstance(response, list):
+                st.session_state.last_chunks = response
+        st.session_state.messages.append({"role": "assistant", "content": response})
+        st.rerun()
+with side_col:
+    st.subheader("Retrieved Chunks")
+    if st.session_state.last_chunks:
+        for doc in st.session_state.last_chunks:
+            source_name = doc.metadata.get('source', 'Unknown').split('/')[-1]
+            with st.expander(f"Source: {source_name}"):
+                st.write(doc.page_content)
+    else:
+        st.info("Chunks used for the answer will appear here. "\
+                "If no chunks appear the model didn't use the retriever tool and search the database, "\
+                "it answered from its own knowledge. Try again or use a smarter (larger) model.")

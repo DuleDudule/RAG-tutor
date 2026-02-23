@@ -28,11 +28,12 @@ llm, embedding_model = get_rag_models()
 def rag_agent(query: str,collection_name: str,top_k: int):
     vectorstore = get_vectorstore(embedding_model,collection_name)
     retriever = vectorstore.as_retriever(search_kwargs ={"k":top_k})
-    
+    retrieved_docs = []
     @tool
     def retrieve_book_context(query: str) -> str:
         """Search and return information from the Data Mining Textbook."""
         docs = retriever.invoke(query)
+        retrieved_docs.extend(docs)
         return "\n\n".join(
             (f"Source: {doc.metadata}\nContent: {doc.page_content}")
             for doc in docs
@@ -46,3 +47,5 @@ def rag_agent(query: str,collection_name: str,top_k: int):
     for chunk in agent_executor.stream({"input": query}):
         if "output" in chunk:
             yield chunk["output"]
+
+    yield retrieved_docs

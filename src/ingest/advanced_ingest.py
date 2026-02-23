@@ -75,7 +75,7 @@ def advanced_ingest(path: str, collection_name: str, page_offset: int = 26):
             
             metadata_header = (
                 f"Chapter {ch_num}: {ch_title}\n"
-                f"Source: {source_file}\n"
+                f"Source: {source_file.split('/')[-1]}\n"
                 f"----------\n"
             )
             chunk.page_content = metadata_header + chunk.page_content

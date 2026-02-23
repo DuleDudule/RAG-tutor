@@ -37,5 +37,7 @@ def simple_chain(query : str,collection_name: str,top_k: int):
     for chunk in llm.stream(messages):
         yield chunk.content
 
+    yield retrieved_docs
+
 
 

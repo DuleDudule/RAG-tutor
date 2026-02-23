@@ -1,0 +1,134 @@
+[
+  {
+    "chapter_number": "1",
+    "title": "An Introduction to Data Mining",
+    "start_page": 1,
+    "end_page": 26
+  },
+  {
+    "chapter_number": "2",
+    "title": "Data Preparation",
+    "start_page": 27,
+    "end_page": 62
+  },
+  {
+    "chapter_number": "3",
+    "title": "Similarity and Distances",
+    "start_page": 63,
+    "end_page": 92
+  },
+  {
+    "chapter_number": "4",
+    "title": "Association Pattern Mining",
+    "start_page": 93,
+    "end_page": 134
+  },
+  {
+    "chapter_number": "5",
+    "title": "Association Pattern Mining: Advanced Concepts",
+    "start_page": 135,
+    "end_page": 152
+  },
+  {
+    "chapter_number": "6",
+    "title": "Cluster Analysis",
+    "start_page": 153,
+    "end_page": 204
+  },
+  {
+    "chapter_number": "7",
+    "title": "Cluster Analysis: Advanced Concepts",
+    "start_page": 205,
+    "end_page": 236
+  },
+  {
+    "chapter_number": "8",
+    "title": "Outlier Analysis",
+    "start_page": 237,
+    "end_page": 264
+  },
+  {
+    "chapter_number": "9",
+    "title": "Outlier Analysis: Advanced Concepts",
+    "start_page": 265,
+    "end_page": 284
+  },
+  {
+    "chapter_number": "10",
+    "title": "Data Classification",
+    "start_page": 285,
+    "end_page": 344
+  },
+  {
+    "chapter_number": "11",
+    "title": "Data Classification: Advanced Concepts",
+    "start_page": 345,
+    "end_page": 388
+  },
+  {
+    "chapter_number": "12",
+    "title": "Mining Data Streams",
+    "start_page": 389,
+    "end_page": 428
+  },
+  {
+    "chapter_number": "13",
+    "title": "Mining Text Data",
+    "start_page": 429,
+    "end_page": 456
+  },
+  {
+    "chapter_number": "14",
+    "title": "Mining Time Series Data",
+    "start_page": 457,
+    "end_page": 492
+  },
+  {
+    "chapter_number": "15",
+    "title": "Mining Discrete Sequences",
+    "start_page": 493,
+    "end_page": 530
+  },
+  {
+    "chapter_number": "16",
+    "title": "Mining Spatial Data",
+    "start_page": 531,
+    "end_page": 556
+  },
+  {
+    "chapter_number": "17",
+    "title": "Mining Graph Data",
+    "start_page": 557,
+    "end_page": 588
+  },
+  {
+    "chapter_number": "18",
+    "title": "Mining Web Data",
+    "start_page": 589,
+    "end_page": 618
+  },
+  {
+    "chapter_number": "19",
+    "title": "Social Network Analysis",
+    "start_page": 619,
+    "end_page": 662
+  },
+  {
+    "chapter_number": "20",
+    "title": "Privacy-Preserving Data Mining",
+    "start_page": 663,
+    "end_page": 694
+  },
+  {
+    "chapter_number": "Bibliography",
+    "title": "Bibliography",
+    "start_page": 695,
+    "end_page": 726
+  },
+  {
+    "chapter_number": "Index",
+    "title": "Index",
+    "start_page": 727,
+    "end_page": null
+  }
+]

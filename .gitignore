@@ -37,6 +37,7 @@ data/processed/*
 data/vector_db/*
 !data/raw/.gitkeep
 !data/processed/.gitkeep
+!data/processed/contents.json
 !data/vector_db/.gitkeep
 .vscode/
 .idea/
