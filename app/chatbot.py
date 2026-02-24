@@ -17,7 +17,7 @@ CHAIN_OPTIONS = {
 
 
 
-st.set_page_config(page_title="Chat with the book",layout="wide")
+st.set_page_config(page_title="RAG Tutor",layout="wide")
 
 st.markdown("""
     <style>
