@@ -54,7 +54,15 @@ def get_vectorstore(embedding_model : OllamaEmbeddings | OpenAIEmbeddings,collec
             collection_name=collection_name,
             vectors_config=VectorParams(size=embedding_dim, distance=Distance.COSINE),
         )
-
+    else:
+        collection_info = client.get_collection(collection_name)
+        existing_size = collection_info.config.params.vectors.size
+        
+        if existing_size != embedding_dim:
+            raise ValueError(
+                f"Dimension Mismatch! Collection '{collection_name}' expects {existing_size} "
+                f"dimensions, but the current model provides {embedding_dim}. "
+            )
     vector_store = QdrantVectorStore(
         client=client,
         collection_name=collection_name,

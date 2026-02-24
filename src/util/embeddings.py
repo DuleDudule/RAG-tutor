@@ -22,7 +22,7 @@ def get_embedding_model(mode : Literal["local","cloud"],model_name : str = "qwen
 
     elif mode=="local":
         require_ollama(model_name)
-        return OllamaEmbeddings(model=model_name)
+        return OllamaEmbeddings(model=model_name,base_url="http://localhost:11434")
  
     else:
         raise ValueError("mode must be 'local' or 'cloud'")

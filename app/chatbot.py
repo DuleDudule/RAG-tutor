@@ -96,6 +96,7 @@ with main_col:
                 st.markdown(prompt)
 
             with st.chat_message("assistant"):
+
                 history = []
                 if use_history:
                     for msg in st.session_state.messages[:-1]:
@@ -104,10 +105,22 @@ with main_col:
                         else:
                             history.append(AIMessage(content=msg["content"]))
 
-                response_gen = chosen_chain_func(prompt,selected_collection,top_k, chat_history=history)
-                response = st.write_stream(stream_handler(response_gen))
-                if isinstance(response, list):
-                    st.session_state.last_chunks = response
+                try:
+                    response_gen = chosen_chain_func(prompt,selected_collection,top_k, chat_history=history)
+                    response = st.write_stream(stream_handler(response_gen))
+                    if isinstance(response, list):
+                        st.session_state.last_chunks = response
+
+                except ValueError as e:
+                    st.error(f"Embedding Error: {str(e)}")
+                    st.info("Please select the embedding model that matches this collection or create a new collection.")
+                    st.session_state.messages.pop() 
+                    st.stop()
+                    
+                except Exception as e:
+                    st.error(f"An unexpected error occurred: {e}")
+                    st.stop()
+
         st.session_state.messages.append({"role": "assistant", "content": response})
         st.rerun()
 with side_col:
