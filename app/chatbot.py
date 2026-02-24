@@ -89,7 +89,7 @@ with main_col:
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
 
-    if prompt := st.chat_input("How can I help you with Data Mining?"):
+    if prompt := st.chat_input("How can I help you with Data Mining? (English only)"):
         st.session_state.messages.append({"role": "user", "content": prompt})
         with chat_container:
             with st.chat_message("user"):

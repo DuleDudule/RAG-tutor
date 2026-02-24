@@ -47,7 +47,37 @@ Once the book is vectorized and stored in **Qdrant** (our vector database), we n
 
 ## Notebooks
 
----
+The project includes several interactive notebooks to demonstrate the core concepts and workflows:
+
+*   **`embedding_demo.ipynb` (the theory behind RAG):** In this notebook, we provide a visual and mathematical introduction to vector embeddings.
+    *   We demonstrate how models like `qwen3-embedding` group semantically similar sentences (comparing animal facts vs data mining concepts).
+    *   We use a 3D interactive plot and PCA (Principal Component Analysis) to visualize how different chapters of the textbook naturally cluster together in high-dimensional space.
+*   **`simple_ingest.ipynb` (baseline):** We provide a walkthrough of a standard RAG ingestion pipeline.
+    *   We cover loading the PDF, performing basic recursive character splitting, and storing the resulting vectors in a vector database (in our case locally).
+    *   We conclude with a basic similarity search to show how retrieval works in practice.
+*   **`advanced_ingest.ipynb` (optimized):** We explore how to improve retrieval quality through structure aware processing.
+    *   We use the `contents.json` map to ensure chunks never cross chapter boundaries.
+    *   We implement metadata injection, where chapter titles are prepended to the text chunks to give the embedding model more context about the information's location.
 
 ## UI
+
+The project provides a user friendly Streamlit interface to manage the entire RAG flow, from data processing to interactive tutoring.
+
+### Textbook Processing (Ingest Page)
+Before chatting, we use the **Ingest Page** to prepare the textbook. This page allows us to:
+*   **Upload the PDF:** We upload the textbook file (found in `data/raw/`) to be processed.
+*   **Select Strategy:** We choose between Simple Chunking for a quick baseline or Advanced Chunking for chapter aware ingestion.
+*   **Configure Granularity:** We use sliders to fine-tune the Chunk Size and Chunk Overlap, allowing us to balance semantic meaning with information density. The collections that come pre-ingested use the default parameters. You can play with them to see how they impact the quality of retrieved results.
+*   **Preprocessing:** We can optionally enable stemming and stop-word removal to experiment with traditional text normalization.
+*   **Named Collections:** We assign a unique name to the collection, enabling us to store and compare different versions of the database (comparing different chunk sizes or embedding models).
+
+### Chat Interface
+The main **Chat Page** is where the tutoring happens. 
+*   **Sidebar Settings:** 
+    *   **Data Source:** We select which Qdrant collection (ingest method) to use for the session.
+    *   **Reasoning Engine:** We choose between Simple RAG (always retrieves context) and Agentic RAG (the model decides when to search the book).
+    *   **Context Management:** We can toggle chat history to manage the LLM's context window (the LLM can remember and reference previous messages).
+    *   **Retrieval Tuning:** We control the number of chunks (**k**) retrieved for each query to optimize the balance between detail and clarity.
+*   **Main Chat:** A standard interactive chat interface where we ask questions about data mining and the contents of the course literature.
+*   **Retrieved Chunks:** We display the exact snippets of text the system found in the book. This includes a relevance score and the specific source metadata, allowing us to verify the LLM's answers against the original text and see chunks generated during the ingest phase.
 
