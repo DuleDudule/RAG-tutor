@@ -24,12 +24,11 @@ st.markdown("Upload the book pdf to process and add it to your Vector Database."
 
 INGEST_METHODS = {
     "Simple Chunking (Fixed Size)": "simple",
-    "Advanced chunking (chapter-based)": "chapter",
-    # "Recursive Character (Paragraphs)": "recursive"
+    "Advanced chunking (Chapter based)": "chapter",
 }
 
 with st.container(border=True):
-    uploaded_file = st.file_uploader("Choose a PDF file of the Textbook", type="pdf")
+    uploaded_file = st.file_uploader("Choose a PDF file of the Textbook (provided in data/raw/)", type="pdf")
     
     selected_method = st.selectbox(
         "Select Ingestion Strategy:",
