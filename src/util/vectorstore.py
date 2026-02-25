@@ -1,6 +1,6 @@
-from langchain_qdrant import QdrantVectorStore
+from langchain_qdrant import QdrantVectorStore, RetrievalMode, FastEmbedSparse
 from qdrant_client import QdrantClient
-from qdrant_client.http.models import Distance, VectorParams
+from qdrant_client.http.models import Distance, VectorParams, SparseVectorParams, SparseIndexParams
 from langchain_ollama import OllamaEmbeddings
 from langchain_openai import OpenAIEmbeddings
 from pathlib import Path
@@ -35,38 +35,62 @@ def close_qdrant_client():
         except Exception:
             pass
         _QDRANT_CLIENT = None
-def get_vectorstore(embedding_model : OllamaEmbeddings | OpenAIEmbeddings,collection_name : str):
+
+mode_mapping = {
+    "dense": RetrievalMode.DENSE,
+    "sparse": RetrievalMode.SPARSE,
+    "hybrid": RetrievalMode.HYBRID,
+}
+
+def get_vectorstore(
+    embedding_model: OllamaEmbeddings | OpenAIEmbeddings,
+    sparse_embedding_model: FastEmbedSparse,
+    collection_name: str,
+    search_type: str = "hybrid",
+):
     """
     Return vectorstore connected to a local collection. 
 
     Args:
-        embedding_model (OllamaEmbeddings,OpenAIEmbeddings) : Embedding model used to embed documents and queries.
-        collection_name (str) : Name of qdrant collection we are connecting to. If the collection doesn't exist creates it.
-
+        embedding_model: Dense embedding model (Ollama or OpenAI).
+        sparse_embedding_model: Sparse BM25 model (FastEmbedSparse).
+        collection_name: Qdrant collection name. Created if it doesnt exist.
+        search_type: One of 'dense', 'sparse', or 'hybrid'. 
     """
     global _QDRANT_CLIENT
 
     client = _get_client()
     embedding_dim = len(embedding_model.embed_query("hello world"))
 
+    selected_mode = mode_mapping.get(search_type, RetrievalMode.HYBRID)
+
     if not client.collection_exists(collection_name):
         client.create_collection(
             collection_name=collection_name,
             vectors_config=VectorParams(size=embedding_dim, distance=Distance.COSINE),
+            sparse_vectors_config={
+                "sparse": SparseVectorParams(
+                    index=SparseIndexParams(on_disk=False)
+                )
+            },
         )
     else:
         collection_info = client.get_collection(collection_name)
         existing_size = collection_info.config.params.vectors.size
-        
+
         if existing_size != embedding_dim:
             raise ValueError(
                 f"Dimension Mismatch! Collection '{collection_name}' expects {existing_size} "
                 f"dimensions, but the current model provides {embedding_dim}. "
             )
+
     vector_store = QdrantVectorStore(
         client=client,
         collection_name=collection_name,
         embedding=embedding_model,
+        sparse_embedding=sparse_embedding_model,
+        retrieval_mode=selected_mode,
+        sparse_vector_name="sparse",
     )
 
     return vector_store

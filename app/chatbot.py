@@ -67,6 +67,14 @@ with st.sidebar:
         value=4,
         help="Higher values provide more context but can confuse the LLM or hit token limits."
     )
+
+    search_type = st.selectbox(
+        "Search Type:",
+        options=["hybrid", "dense", "sparse"],
+        index=0,
+        help="hybrid = keyword + semantic, dense = semantic only, sparse = keyword only."
+    )
+
     chosen_chain_func = CHAIN_OPTIONS[selected_chain_name]
 
 if "last_chunks" not in st.session_state:
@@ -106,7 +114,7 @@ with main_col:
                             history.append(AIMessage(content=msg["content"]))
 
                 try:
-                    response_gen = chosen_chain_func(prompt,selected_collection,top_k, chat_history=history)
+                    response_gen = chosen_chain_func(prompt, selected_collection, top_k, search_type=search_type, chat_history=history)
                     response = st.write_stream(stream_handler(response_gen))
                     if isinstance(response, list):
                         st.session_state.last_chunks = response
@@ -129,10 +137,11 @@ with side_col:
         for doc in st.session_state.last_chunks:
             source_name = doc.metadata.get('source', 'Unknown').split('/')[-1]
             score = doc.metadata.get('relevance_score', 0)
-            score_percent = f"{score:.2%}"
 
-            with st.expander(f"Source: {source_name}\nRelevance score: {score_percent}"):
-                st.progress(score)
+            with st.expander(f"Source: {source_name}  |  Score: {score:.4f}"):
+                # st.progress() requires [0.0, 1.0]; raw hybrid scores can exceed 1.0
+                # so we clamp here only — the raw value is still shown in the label above
+                st.progress(min(max(score, 0.0), 1.0))
                 st.write(doc.page_content)
     else:
         st.info("Chunks used for the answer will appear here. "\
