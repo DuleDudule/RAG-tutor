@@ -58,7 +58,8 @@ To run the app run the following in the terminal:
 ```bash
 poetry run python -m streamlit run app/chatbot.py
 ```
-Navigate to the ingest page in the sidebar, choose your preprocessing strategy and upload the Data Mining Textbook.
+The repo comes with the book already ingested using different strategies and embedding models. Select them from the dropdown menu on the chat page and get to studying.
+If you wish to experiment with your own model or chunking parameters then navigate to the ingest page in the sidebar, choose your preprocessing strategy and upload the Data Mining Textbook.
 Now on the chatbot page select the collection you just uploaded, adjust parameters and chat with the LLM equiped with the knowledge from the book.
 By uploading the book using different strategies and choosing those collections on the chat page you can compare the quality of the answers.
 

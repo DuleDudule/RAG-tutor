@@ -11,6 +11,7 @@ Large Language Models (LLMs) are trained on vast datasets, but they possess two 
 3.  **Augmentation:** The retrieved sections are prepended to the user's question as context.
 4.  **Generation:** The LLM generates a response based *only* on the provided context (for theory) while using its general capabilities for practical tasks (like writing Python code).
 
+![RAG pipeline](images/Definition-of-retrieval-augmented-generation-1-1024x614.webp)
 ---
 
 ## Embedding Models
@@ -23,6 +24,7 @@ In this project, we support two modes:
 - **Local:** Using Ollama (defaulting to `qwen3-embedding:0.6b`), which allows for private, offline processing.
 - **Cloud:** Using OpenAI’s `text-embedding-3-small` for higher performance and dimensionality.
 
+![Embeddings](images/1_-AL-kK8HzK5lw84xr1cSvw.png)
 ### Hybrid Search & Sparse Embeddings
 While dense embeddings are great for semantic meaning, they can sometimes miss specific keywords or technical terms (like "BM25" or "Apriori"). To solve this, we implemented **Hybrid Search**.
 
@@ -40,6 +42,8 @@ By combining these into a single **Hybrid** retrieval mode, we get the best of b
 Ingestion is the process of preparing the textbook for retrieval. We implemented two distinct strategies to compare performance:
 
 *   **Simple Ingest (`simple_ingest.py`):** Uses a `RecursiveCharacterTextSplitter` to break the PDF into chunks of a fixed size (2000 characters). This is universal but blind to the book's structure.
+
+![Simple RAG](images/Screenshot%202026-02-26%20at%2016.57.44.png)
 *   **Advanced Ingest (`advanced_ingest.py`):** We use a custom `contents.json` (generated with LLM assistance) to map chapter boundaries. 
     *   **Chapter Awareness:** Chunks are created within chapter boundaries, ensuring a chunk doesn't bridge two unrelated topics.
     *   **Metadata Injection:** We explicitly prepend chapter titles and numbers to the text of each chunk. Since the embedding model only sees the text content, this ensures that the semantic vector includes the context of where the information came from.
