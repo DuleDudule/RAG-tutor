@@ -1,9 +1,10 @@
 
 ## What is RAG and Why Use It?
-
+---
 Large Language Models (LLMs) are trained on vast datasets, but they possess two major limitations: **knowledge cutoff** (they don't know about data published after their training) and **lack of private context** (they are unaware of your specific data, such as private company documents, proprietary code, or specialized textbooks not in their training set). 
 
 **Retrieval-Augmented Generation (RAG)** addresses these issues by providing the LLM with an intelligent way to access external information based on its semantic meaning. Instead of relying solely on its pre-trained internal weights, the model is supplied with specific, relevant snippets of text retrieved from a trusted source—in our case, Charu C. Aggarwal's *Data Mining: The Textbook*.
+---
 
 ### How it works:
 1.  **User Query:** The student asks a question.
@@ -43,7 +44,7 @@ Ingestion is the process of preparing the textbook for retrieval. We implemented
 
 *   **Simple Ingest (`simple_ingest.py`):** Uses a `RecursiveCharacterTextSplitter` to break the PDF into chunks of a fixed size (2000 characters). This is universal but blind to the book's structure.
 
-![Simple RAG](images/Screenshot%202026-02-26%20at%2016.57.44.png)
+
 *   **Advanced Ingest (`advanced_ingest.py`):** We use a custom `contents.json` (generated with LLM assistance) to map chapter boundaries. 
     *   **Chapter Awareness:** Chunks are created within chapter boundaries, ensuring a chunk doesn't bridge two unrelated topics.
     *   **Metadata Injection:** We explicitly prepend chapter titles and numbers to the text of each chunk. Since the embedding model only sees the text content, this ensures that the semantic vector includes the context of where the information came from.
@@ -57,8 +58,21 @@ Once the book is vectorized and stored in **Qdrant** (our vector database), we n
 
 *   **Vector Database:** Qdrant stores both dense and sparse embeddings. When a query comes in, it performs multi-vector searches depending on the selected mode.
 *   **Simple Chain (`simple_rag.py`):** In this simple approach we first explicitly fetch similar documents from the database and then inject them into a prompt along with the user question. We make one LLM call with this prompt and expect an answer grounded in the retrieved context. This simple approach is usefull in a Q&A system where we dont want/need to have an interactive conversation with the LLM - we just want it to answer the question using the contents of the database. While simple and cheap this has its limitations.
+**Simple RAG prompt format:**
+![Simple RAG](images/Screenshot%202026-02-26%20at%2016.57.44.png)
 *   **Agentic Retrieval (`rag_agent.py`):** We use a Tool Calling agent. Instead of a linear search, the LLM is given a tool (`retrieve_book_context`). The LLM *decides* when it needs more information and what search query to use, allowing for more nuanced multi-step reasoning. This approach lets as ask unrelated questions without confusing the LLM while also allowing it to search the database multiple times with different queries to find the most relevant data about the question.
 
+<table>
+<tr>
+    <td align="center"><b>Workflow</b></td>
+    <td align="center"><b>Agent trace</b></td>
+  </tr>
+  <tr>
+    <td><img src="images/Screenshot%202026-02-26%20202254.png" width="100%"></td>
+    <td><img src="images/Screenshot 2026-02-26 211144.png" width="100%"></td>
+  </tr>
+  
+</table>
 ---
 
 ## Notebooks
@@ -74,7 +88,7 @@ The project includes several interactive notebooks to demonstrate the core conce
 *   **`advanced_ingest.ipynb` (optimized):** We explore how to improve retrieval quality through structure aware processing.
     *   We use the `contents.json` map to ensure chunks never cross chapter boundaries.
     *   We implement metadata injection, where chapter titles are prepended to the text chunks to give the embedding model more context about the information's location.
-
+---
 ## UI
 
 The project provides a user friendly Streamlit interface to manage the entire RAG flow, from data processing to interactive tutoring.
@@ -87,6 +101,7 @@ Before chatting, we use the **Ingest Page** to prepare the textbook. This page a
 *   **Preprocessing:** We can optionally enable stemming and stop-word removal to experiment with traditional text normalization.
 *   **Named Collections:** We assign a unique name to the collection, enabling us to store and compare different versions of the database (comparing different chunk sizes or embedding models).
 
+![Ingest page](images/Screenshot%202026-02-26%20210058.png)
 ### Chat Interface
 The main **Chat Page** is where the tutoring happens. 
 *   **Sidebar Settings:** 
@@ -98,3 +113,16 @@ The main **Chat Page** is where the tutoring happens.
 *   **Main Chat:** A standard interactive chat interface where we ask questions about data mining and the contents of the course literature.
 *   **Retrieved Chunks:** We display the exact snippets of text the system found in the book. This includes a relevance score and the specific source metadata, allowing us to verify the LLM's answers against the original text and see chunks generated during the ingest phase.
 
+![Interface](images/Screenshot%202026-02-26%20204535.png)
+
+---
+
+## Improvenets
+
+**What I would add next:**
+
+* More robust preprocessing pipeline that handles tabular data and formulas using OCR
+* More robust intesting pipeline agnostic to any book
+* Generating a ground truth dataset used for system evaluation
+* More advanced retrieval pipeline for reranking retrieved documents
+* Support for Serbian (easy to implemetn but I ran out of time)
