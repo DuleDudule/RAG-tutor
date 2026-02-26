@@ -23,6 +23,15 @@ In this project, we support two modes:
 - **Local:** Using Ollama (defaulting to `qwen3-embedding:0.6b`), which allows for private, offline processing.
 - **Cloud:** Using OpenAI’s `text-embedding-3-small` for higher performance and dimensionality.
 
+### Hybrid Search & Sparse Embeddings
+While dense embeddings are great for semantic meaning, they can sometimes miss specific keywords or technical terms (like "BM25" or "Apriori"). To solve this, we implemented **Hybrid Search**.
+
+In addition to dense vectors, we generate **sparse embeddings** using the **BM25 algorithm** (via `FastEmbedSparse`). This represents traditional data mining and information retrieval:
+- **Keyword Search (Sparse):** Finds exact matches for specific terms.
+- **Semantic Search (Dense):** Finds contextually similar concepts.
+
+By combining these into a single **Hybrid** retrieval mode, we get the best of both worlds: the precision of keyword matching and the depth of semantic understanding.
+
 ---
 
 ## Implementation Details
@@ -37,9 +46,12 @@ Ingestion is the process of preparing the textbook for retrieval. We implemented
     *   **Preprocessing:** Optional stemming and stop-word removal (`src/util/stemming.py`) can be applied to reduce noise. This is included to demonstrate how a more traditional data preprocessing technique could be paired with more modern approaches. However, since modern embedding models are trained on text data consisting of full, grammatically correct senteces this doesnt necessarily improve the retrieval performance.
 
 ### Step 2: Retrieval (`src/retrieval/`)
-Once the book is vectorized and stored in **Qdrant** (our vector database), we need to find the right information.
+Once the book is vectorized and stored in **Qdrant** (our vector database), we need to find the right information. We support three retrieval modes:
+*   **Dense (Semantic):** Uses cosine similarity on dense embeddings to find meanings.
+*   **Sparse (Keyword):** Uses BM25 scores to find exact word matches.
+*   **Hybrid:** Mathematically combines both scores, letting us compare and combine traditional information retrieval with modern LLM based embeddings.
 
-*   **Vector Database:** Qdrant stores the embeddings and performs Cosine Similarity searches. When a query comes in, it's embedded, and the database returns the $k$ most similar chunks.
+*   **Vector Database:** Qdrant stores both dense and sparse embeddings. When a query comes in, it performs multi-vector searches depending on the selected mode.
 *   **Simple Chain (`simple_rag.py`):** In this simple approach we first explicitly fetch similar documents from the database and then inject them into a prompt along with the user question. We make one LLM call with this prompt and expect an answer grounded in the retrieved context. This simple approach is usefull in a Q&A system where we dont want/need to have an interactive conversation with the LLM - we just want it to answer the question using the contents of the database. While simple and cheap this has its limitations.
 *   **Agentic Retrieval (`rag_agent.py`):** We use a Tool Calling agent. Instead of a linear search, the LLM is given a tool (`retrieve_book_context`). The LLM *decides* when it needs more information and what search query to use, allowing for more nuanced multi-step reasoning. This approach lets as ask unrelated questions without confusing the LLM while also allowing it to search the database multiple times with different queries to find the most relevant data about the question.
 
@@ -75,6 +87,7 @@ Before chatting, we use the **Ingest Page** to prepare the textbook. This page a
 The main **Chat Page** is where the tutoring happens. 
 *   **Sidebar Settings:** 
     *   **Data Source:** We select which Qdrant collection (ingest method) to use for the session.
+    *   **Search Type:** We choose between **Hybrid** (Keyword + Semantic), **Dense** (Semantic Only), or **Sparse** (Keyword Only) search to optimize retrieval for different types of questions.
     *   **Reasoning Engine:** We choose between Simple RAG (always retrieves context) and Agentic RAG (the model decides when to search the book).
     *   **Context Management:** We can toggle chat history to manage the LLM's context window (the LLM can remember and reference previous messages).
     *   **Retrieval Tuning:** We control the number of chunks (**k**) retrieved for each query to optimize the balance between detail and clarity.

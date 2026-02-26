@@ -43,6 +43,14 @@ with st.sidebar:
 
     st.divider()
 
+    st.header("Search Type")
+    search_type = st.selectbox(
+        "Select search type:",
+        options=["hybrid", "dense", "sparse"],
+        index=0,
+        help="hybrid = keyword + semantic, dense = semantic only, sparse = keyword only."
+    )
+    st.divider()
     st.header("RAG approach")
 
     selected_chain_name = st.selectbox(
@@ -68,13 +76,6 @@ with st.sidebar:
         help="Higher values provide more context but can confuse the LLM or hit token limits."
     )
 
-    st.header("Search Type")
-    search_type = st.selectbox(
-        "Select search type:",
-        options=["hybrid", "dense", "sparse"],
-        index=0,
-        help="hybrid = keyword + semantic, dense = semantic only, sparse = keyword only."
-    )
 
     chosen_chain_func = CHAIN_OPTIONS[selected_chain_name]
 
