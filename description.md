@@ -3,7 +3,8 @@
 ---
 Large Language Models (LLMs) are trained on vast datasets, but they possess two major limitations: **knowledge cutoff** (they don't know about data published after their training) and **lack of private context** (they are unaware of your specific data, such as private company documents, proprietary code, or specialized textbooks not in their training set). 
 
-**Retrieval-Augmented Generation (RAG)** addresses these issues by providing the LLM with an intelligent way to access external information based on its semantic meaning. Instead of relying solely on its pre-trained internal weights, the model is supplied with specific, relevant snippets of text retrieved from a trusted source—in our case, Charu C. Aggarwal's *Data Mining: The Textbook*.
+**Retrieval-Augmented Generation (RAG)** addresses these issues by providing the LLM with an intelligent way to access external information based on its semantic meaning. Instead of relying solely on its pre-trained internal weights, the model is supplied with specific, relevant snippets of text retrieved from a trusted source—in our case, Charu C. Aggarwal's Data Mining: The Textbook.
+
 ---
 
 ### How it works:
@@ -57,6 +58,7 @@ Once the book is vectorized and stored in **Qdrant** (our vector database), we n
 *   **Hybrid:** Mathematically combines both scores, letting us compare and combine traditional information retrieval with modern LLM based embeddings.
 
 *   **Vector Database:** Qdrant stores both dense and sparse embeddings. When a query comes in, it performs multi-vector searches depending on the selected mode.
+
 *   **Simple Chain (`simple_rag.py`):** In this simple approach we first explicitly fetch similar documents from the database and then inject them into a prompt along with the user question. We make one LLM call with this prompt and expect an answer grounded in the retrieved context. This simple approach is usefull in a Q&A system where we dont want/need to have an interactive conversation with the LLM - we just want it to answer the question using the contents of the database. While simple and cheap this has its limitations.
 **Simple RAG prompt format:**
 ![Simple RAG](images/Screenshot%202026-02-26%20at%2016.57.44.png)
