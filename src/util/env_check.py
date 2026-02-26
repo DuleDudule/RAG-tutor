@@ -1,8 +1,11 @@
 import os
 from src.util.embeddings import get_embedding_model as _get_embedding_model
 from src.util.llm import get_llm as _get_llm
+from langchain_qdrant import FastEmbedSparse
 from dotenv import load_dotenv
 load_dotenv() 
+
+sparse_model = FastEmbedSparse(model_name="Qdrant/bm25")
 
 def _validate_env():
     """Checks if all required env variables are set."""
@@ -18,6 +21,5 @@ def get_embed_model():
     return _get_embedding_model(os.getenv("EMBEDDING_MODE", "local"), os.getenv("EMBEDDING_MODEL_NAME"))
 
 def get_rag_models():
-    """Returns both for the main RAG chain."""
-    return get_llm_model(), get_embed_model()
-
+    """Returns (llm, dense_embedding_model, sparse_embedding_model) for the main RAG chain."""
+    return get_llm_model(), get_embed_model(), sparse_model

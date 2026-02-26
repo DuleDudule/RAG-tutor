@@ -3,7 +3,7 @@ from uuid import uuid4
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
-from src.util.env_check import get_embed_model
+from src.util.env_check import get_rag_models
 from src.util.vectorstore import get_vectorstore
 from pathlib import Path
 
@@ -86,12 +86,31 @@ def advanced_ingest(path: str, collection_name: str,stem_and_stop: bool = False,
                 chunk.metadata["preprocessed"] = True
                 chunk.page_content = preprocess_text(chunk.page_content)
             chunk.page_content = metadata_header + chunk.page_content
-
-        embedding_model = get_embed_model()
-        vector_store = get_vectorstore(embedding_model, collection_name)
+        _, embedding_model, sparse_model = get_rag_models()
+        vector_store = get_vectorstore(embedding_model, sparse_model, collection_name)
 
         uuids = [str(uuid4()) for _ in range(len(all_chunks))]
-        vector_store.add_documents(documents=all_chunks, ids=uuids)
+
+        batch_size = 100
+        for i in range(0, len(all_chunks), batch_size):
+            batch_docs = all_chunks[i : i + batch_size]
+            batch_ids = uuids[i : i + batch_size]
+            
+            # print(f"Ingesting batch {i // batch_size + 1} ({len(batch_docs)} docs)...")
+            for idx, doc in enumerate(batch_docs):
+                if len(doc.page_content) > 7000: 
+                     print(f"Large chunk detected (idx {idx}): {len(doc.page_content)} chars")
+            
+            try:
+                vector_store.add_documents(documents=batch_docs, ids=batch_ids)
+            except Exception as e:
+                print(f"Error in batch {i // batch_size + 1}: {e}")
+                # Print the largest chunk in this batch for inspection
+                largest_chunk = max(batch_docs, key=lambda d: len(d.page_content))
+                print(f"Largest chunk in failed batch: {len(largest_chunk.page_content)} chars. "\
+                      "Try using smaller chunk size and change collection name to avoid errors.")
+                print(f"Context preview: {largest_chunk.page_content[:200]}...")
+                raise e
         
         return len(all_chunks)
 

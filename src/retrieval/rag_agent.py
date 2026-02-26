@@ -31,15 +31,15 @@ prompt = ChatPromptTemplate.from_messages(
     ]
 )
 
-llm, embedding_model = get_rag_models()
+llm, embedding_model, sparse_model = get_rag_models()
 
-def rag_agent(query: str,collection_name: str,top_k: int, chat_history=None):
-    vectorstore = get_vectorstore(embedding_model,collection_name)
+def rag_agent(query: str, collection_name: str, top_k: int, search_type: str = "hybrid", chat_history=None):
+    vectorstore = get_vectorstore(embedding_model, sparse_model, collection_name, search_type)
     retrieved_docs = []
     @tool
     def retrieve_book_context(query: str) -> str:
         """Search and return information from the Data Mining Textbook."""
-        results = vectorstore.similarity_search_with_relevance_scores(query, k=top_k)
+        results = vectorstore.similarity_search_with_score(query, k=top_k)
         docs_for_agent = []
         for doc, score in results:
             doc.metadata["relevance_score"] = score
