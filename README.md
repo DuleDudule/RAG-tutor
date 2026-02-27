@@ -1,4 +1,4 @@
-#  RAG-Tutor: Minig Text Data & RAG
+#  RAG-Tutor: Mining Text Data & RAG
 
 **Student:** Dušan Jevtović (408/21)  
 **Course:** Istraživanje podataka 2 (Data Mining 2)  
@@ -9,7 +9,8 @@
 
 ##  Description
 Demonstrating Retrieval Augmented Generation (RAG) and the power of embedding models to capture semantic meaning behind text data.
-The final product is an LLM chatbot augmented with the knowledge from course literature ([Data Mining The Textbook](https://link.springer.com/book/10.1007/978-3-319-14142-8)) that students can use to study Data Mining.
+The final product is an LLM chatbot augmented with the knowledge from course literature ([Data Mining The Textbook](https://link.springer.com/book/10.1007/978-3-319-14142-8)) that students can use to study Data Mining.  
+You can find a more detailed description of the project in the [description.md](description.md) file.
 
 
 
@@ -18,6 +19,7 @@ The final product is an LLM chatbot augmented with the knowledge from course lit
 ##  Setup & Installation
 
 ### 1. Prerequisites
+- **Python** (3.12)
 - **Poetry** (for dependency management)
 - **Ollama** (optional, for local LLM support)
 
@@ -42,7 +44,7 @@ Copy the .env.example file and set the required variables
 ```bash
 cp .env.example .env
 ```
-If you're going for local execution set the LLM_MODE and EMBEDDING_MODE to "local". Pull the model you want to use and set that model name in .env. :
+If you're going for local execution set the LLM_MODE and EMBEDDING_MODE to "local". Pull the model you want to use and set that model name in .env :
 ```bash
 ollama pull <model_name>
 ```
@@ -51,7 +53,7 @@ If you want to stick to small default models i chose (the ones set in .env.examp
 ```bash
 ollama pull qwen3-embedding:0.6b && ollama pull qwen3:1.7b
 ```
-If you want to use te OpenAI api you need to set the appropriate variables to "cloud" and configure and set an api key and model name supported by the OpenAI api
+If you want to use the OpenAI api you need to set the appropriate variables to "cloud" and configure and set an api key and model name supported by the OpenAI api
 
 ### 4. How to use
 To run the app run the following in the terminal:
@@ -70,7 +72,7 @@ By uploading the book using different strategies and choosing those collections 
 ## 5. Considerations
 - **Embedding model** - Different embedding models produce embeddings (vectors) of different sizes. 
 If you use one model to process the book and save it to the vector database and then change the model later you might run into errors. Make sure to match the embedding model you use for RAG with the one used to ingest the document.
-The collections that come included with the project used the default `qwen3-embedding:0.6b` for ingesting so if you want to use them don't change the default model in the .env file. I also included collections ingested using OpenAIs `text-embedding-3-small`.
+The pre-ingested collections labeled with "openai" were ingested using OpenAI's `text-embedding-3-small` model. The ones labeled with "ollama" were ingested using the default embedding model set in .env.example (`qwen3-embedding:0.6b`).
 
 - **RAG** - Answer quality changes drastically based on the capabilities of the LLM you use. 
 For best results use the largest model your system can handle locally or the OpenAI api. 

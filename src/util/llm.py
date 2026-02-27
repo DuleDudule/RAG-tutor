@@ -23,7 +23,7 @@ def get_llm(mode : Literal["local","cloud"],model_name : str = "qwen3-embedding:
             raise RuntimeError("Failed calling OpenAI, check your api key and model name")
 
     elif mode=="local":
-        # require_ollama(model_name)
+        require_ollama(model_name)
         llm = ChatOllama(model=model_name)
  
     else:

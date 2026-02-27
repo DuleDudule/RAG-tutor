@@ -11,8 +11,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 available_collections = get_all_collection_names()
 
 CHAIN_OPTIONS = {
-    "Simple RAG (Standard)": simple_chain,
-    "Agentic RAG (Tool-Calling)": rag_agent
+    "Agentic RAG (Tool-Calling)": rag_agent,
+    "Simple RAG (Standard)": simple_chain
 }
 
 
