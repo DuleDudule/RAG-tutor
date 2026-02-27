@@ -30,10 +30,10 @@ def simple_ingest(path: str, collection_name: str,stem_and_stop: bool = False, c
                 text.page_content = preprocess_text(text.page_content)
                 
         _, embedding_model, sparse_model = get_rag_models()
-        vector_store = get_vectorstore(embedding_model, sparse_model, collection_name)
+        vector_store = get_vectorstore(embedding_model, sparse_model, collection_name+"_with_stemming")
 
         uuids = [str(uuid4()) for _ in range(len(texts))]
-
+    
         batch_size = 100
         for i in range(0, len(texts), batch_size):
             batch_docs = texts[i : i + batch_size]

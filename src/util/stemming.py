@@ -5,6 +5,7 @@ import re
 
 nltk.download('stopwords')
 nltk.download('punkt')
+nltk.download('punkt_tab')
 
 def preprocess_text(text: str) -> str:
     words = nltk.word_tokenize(text.lower())
