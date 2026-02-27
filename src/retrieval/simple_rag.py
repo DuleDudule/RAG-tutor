@@ -18,8 +18,13 @@ def simple_chain(
     find the most similar chunks of the book.
     These are passed to the llm as context from which it should answer.
     """
+    search_query = query
+    if "with_stemming" in collection_name:
+        from src.util.stemming import preprocess_text
+        search_query = preprocess_text(query)
+
     vector_store = get_vectorstore(embedding_model, sparse_model, collection_name, search_type)
-    retrieved_docs = vector_store.similarity_search_with_score(query,k=top_k)
+    retrieved_docs = vector_store.similarity_search_with_score(search_query, k=top_k)
 
     formatted_docs = []
     docs_content_list = []

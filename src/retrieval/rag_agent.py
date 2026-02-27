@@ -39,7 +39,12 @@ def rag_agent(query: str, collection_name: str, top_k: int, search_type: str = "
     @tool
     def retrieve_book_context(query: str) -> str:
         """Search and return information from the Data Mining Textbook."""
-        results = vectorstore.similarity_search_with_score(query, k=top_k)
+        search_query = query
+        if "with_stemming" in collection_name:
+            from src.util.stemming import preprocess_text
+            search_query = preprocess_text(query)
+
+        results = vectorstore.similarity_search_with_score(search_query, k=top_k)
         docs_for_agent = []
         for doc, score in results:
             doc.metadata["relevance_score"] = score
