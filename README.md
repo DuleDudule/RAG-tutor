@@ -69,7 +69,7 @@ Now on the chatbot page select the collection you just uploaded, adjust paramete
 By uploading the book using different strategies and choosing those collections on the chat page you can compare the quality of the answers.
 
 ---
-## 5. Considerations
+## Considerations
 - **Embedding model** - Different embedding models produce embeddings (vectors) of different sizes. 
 If you use one model to process the book and save it to the vector database and then change the model later you might run into errors. Make sure to match the embedding model you use for RAG with the one used to ingest the document.
 The pre-ingested collections labeled with "openai" were ingested using OpenAI's `text-embedding-3-small` model. The ones labeled with "ollama" were ingested using the default embedding model set in .env.example (`qwen3-embedding:0.6b`).
