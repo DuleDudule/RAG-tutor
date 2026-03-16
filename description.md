@@ -117,6 +117,7 @@ The main **Chat Page** is where the tutoring happens.
     *   **Search Type:** We choose between **Hybrid** (Keyword + Semantic), **Dense** (Semantic Only), or **Sparse** (Keyword Only) search to optimize retrieval for different types of questions.
     *   **Reasoning Engine:** We choose between Simple RAG (always retrieves context) and Agentic RAG (the model decides when to search the book).
     *   **Context Management:** We can toggle chat history to manage the LLM's context window (the LLM can remember and reference previous messages).
+    *   **Language Selection:** Choose what language you want to learn in (English and Serbian supported)
     *   **Retrieval Tuning:** We control the number of chunks (**k**) retrieved for each query to optimize the balance between detail and clarity.
 *   **Main Chat:** A standard interactive chat interface where we ask questions about data mining and the contents of the course literature.
 *   **Retrieved Chunks:** We display the exact snippets of text the system found in the book. This includes a relevance score and the specific source metadata, allowing us to verify the LLM's answers against the original text and see chunks generated during the ingest phase.
@@ -133,4 +134,4 @@ The main **Chat Page** is where the tutoring happens.
 * A more robust ingesting pipeline agnostic to any book
 * A ground truth dataset used for system evaluation and an evaluation pipeline
 * A more advanced retrieval pipeline for reranking retrieved documents
-* Support for Serbian 
+* Support for Serbian (implemented)

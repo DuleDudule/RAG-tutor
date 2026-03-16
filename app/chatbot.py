@@ -109,7 +109,8 @@ with main_col:
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
 
-    if prompt := st.chat_input("How can I help you with Data Mining? (English only)"):
+    prompt_text = "How can I help you with Data Mining?" if selected_language == "en" else "Pitaj me nesto o Istrazivanju Podataka"
+    if prompt := st.chat_input(prompt_text):
         st.session_state.messages.append({"role": "user", "content": prompt})
         with chat_container:
             with st.chat_message("user"):
