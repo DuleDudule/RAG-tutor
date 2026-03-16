@@ -1,8 +1,13 @@
 from src.util.vectorstore import get_vectorstore
+from src.util.translator import translate_query
 from langchain.tools import tool
 from langchain.agents import create_tool_calling_agent,AgentExecutor
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.messages import BaseMessage
+
 from src.util.env_check import get_rag_models
+from typing import List, Optional, Literal
+
 
 prompt = ChatPromptTemplate.from_messages(
     [
@@ -21,8 +26,9 @@ prompt = ChatPromptTemplate.from_messages(
             "  - Use double dollar signs for standalone equations (e.g., $$E=mc^2$$).\n"
             "  - Use single dollar signs for inline math (e.g., $x^2$).\n"
             "  - Do not use brackets like \\[ \\] or \\( \\) for math.\n"
-            "- TONE AND STRUCTURE: Be encouraging, clear, and pedagogical. Use Markdown formatting, clear headings, and bullet points to make your explanations scannable and easy to digest.\n\n"
-            
+            "  - TONE AND STRUCTURE: Be encouraging, clear, and pedagogical. Use Markdown formatting, clear headings, and bullet points to make your explanations scannable and easy to digest.\n\n"
+            "  - Make sure to respond in {target_language} language while keeping the necessary technical terms in english.\n\n"
+
             "You MUST use the available tool to search for the answer in the book."
         )),
         MessagesPlaceholder("chat_history", optional=True),
@@ -33,13 +39,26 @@ prompt = ChatPromptTemplate.from_messages(
 
 llm, embedding_model, sparse_model = get_rag_models()
 
-def rag_agent(query: str, collection_name: str, top_k: int, search_type: str = "hybrid", chat_history=None):
+def rag_agent(
+    query: str, 
+    collection_name: str, 
+    top_k: int, 
+    search_type: str = "hybrid",    
+    language: Literal["sr","en"] = "en", 
+    chat_history: Optional[List[BaseMessage]]=None
+):
     vectorstore = get_vectorstore(embedding_model, sparse_model, collection_name, search_type)
     retrieved_docs = []
     @tool
     def retrieve_book_context(query: str) -> str:
         """Search and return information from the Data Mining Textbook."""
+        original_query=query
+        if language=="sr":
+            result=translate_query(query,"sr","en",llm)
+            query=result.get("translated_query",query)
+
         search_query = query
+
         sample_docs = vectorstore.similarity_search(search_query,k=1)
         sample_doc = sample_docs[0]
         preproccessed = sample_doc.metadata.get('preprocessed',False)
@@ -47,7 +66,6 @@ def rag_agent(query: str, collection_name: str, top_k: int, search_type: str = "
             from src.util.stemming import preprocess_text
             search_query = preprocess_text(query)
 
-        # print(search_query) checking if the fix works
         results = vectorstore.similarity_search_with_score(search_query, k=top_k)
         docs_for_agent = []
         for doc, score in results:
@@ -63,7 +81,13 @@ def rag_agent(query: str, collection_name: str, top_k: int, search_type: str = "
     agent = create_tool_calling_agent(llm, tools,prompt)
     agent_executor = AgentExecutor(agent=agent, tools=tools)
 
-    for chunk in agent_executor.stream({"input": query, "chat_history": chat_history or []}):
+    language_mapping={
+        "en":"English",
+        "sr":"Serbian"
+    }
+    target_language=language_mapping.get(language)
+
+    for chunk in agent_executor.stream({"target_language":target_language,"input": query, "chat_history": chat_history or []}):
         if "output" in chunk:
             yield chunk["output"]
 

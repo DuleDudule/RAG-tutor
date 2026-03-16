@@ -67,6 +67,16 @@ with st.sidebar:
     
     st.divider()
 
+    st.header("Language")
+    selected_language = st.selectbox(
+        "Select Language:",
+        options=["en", "sr"],
+        index=0,
+        help="Choose the language for responses: English (en) or Serbian (sr)."
+    )
+
+    st.divider()
+
     st.header("Retrieval Settings")
     top_k = st.slider(
         "Number of chunks to retrieve (k):",
@@ -116,7 +126,7 @@ with main_col:
                             history.append(AIMessage(content=msg["content"]))
 
                 try:
-                    response_gen = chosen_chain_func(prompt, selected_collection, top_k, search_type=search_type, chat_history=history)
+                    response_gen = chosen_chain_func(prompt, selected_collection, top_k, search_type=search_type, language=selected_language, chat_history=history)
                     response = st.write_stream(stream_handler(response_gen))
                     if isinstance(response, list):
                         st.session_state.last_chunks = response

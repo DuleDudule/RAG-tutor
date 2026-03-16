@@ -1,7 +1,8 @@
 from src.util.vectorstore import get_vectorstore
 from src.util.env_check import get_rag_models
+from src.util.translator import translate_query
 from langchain_core.messages import SystemMessage, HumanMessage, BaseMessage
-from typing import List, Optional
+from typing import List, Optional, Literal
 
 
 llm, embedding_model, sparse_model = get_rag_models()
@@ -11,6 +12,7 @@ def simple_chain(
     collection_name: str,
     top_k: int,
     search_type: str = "hybrid",
+    language: Literal["sr","en"] = "en",
     chat_history: Optional[List[BaseMessage]] = None,
 ):
     """
@@ -18,17 +20,22 @@ def simple_chain(
     find the most similar chunks of the book.
     These are passed to the llm as context from which it should answer.
     """
+    original_query=query
+    if language=="sr":
+        result=translate_query(query,"sr","en",llm)
+        query=result.get("translated_query",query)
+
     vector_store = get_vectorstore(embedding_model, sparse_model, collection_name, search_type)
-    search_query = query
-    sample_docs = vector_store.similarity_search(search_query,k=1)
+
+    sample_docs = vector_store.similarity_search(query,k=1)
     sample_doc = sample_docs[0]
     preproccessed = sample_doc.metadata.get('preprocessed',False)
+    search_query=query
     if preproccessed:
         from src.util.stemming import preprocess_text
         search_query = preprocess_text(query)
 
     retrieved_docs = vector_store.similarity_search_with_score(search_query, k=top_k)
-
     formatted_docs = []
     docs_content_list = []
 
@@ -41,7 +48,12 @@ def simple_chain(
 
     docs_content = "\n<TEXT CHUNK>\n".join(docs_content_list)
 
-
+    
+    language_mapping={
+        "en":"English",
+        "sr":"Serbian"
+    }
+    target_language=language_mapping.get(language)
     system_message = (
         "You are an expert Data Mining Tutor helping a student study from Charu C. Aggarwal's 'Data Mining: The Textbook'.\n\n"
 
@@ -57,8 +69,8 @@ def simple_chain(
         "  - Use double dollar signs for standalone equations (e.g., $$E=mc^2$$).\n"
         "  - Use single dollar signs for inline math (e.g., $x^2$).\n"
         "  - Do not use brackets like \\[ \\] or \\( \\) for math.\n"
-        "- TONE AND STRUCTURE: Be encouraging, clear, and pedagogical. Use Markdown formatting, clear headings, and bullet points to make your explanations scannable and easy to digest.\n\n"
-
+        "  - TONE AND STRUCTURE: Be encouraging, clear, and pedagogical. Use Markdown formatting, clear headings, and bullet points to make your explanations scannable and easy to digest.\n\n"
+        f"  - Make sure to respond in {target_language} language while keeping the necessary technical terms in english.\n\n"
         "Here is the context:\n"
         f"{docs_content}"
     )
